@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
+import { useRouter } from 'next/router';
 import firebase from 'firebase';
 import '../components/fire';
 import AuthContext from '../contexts/AuthContext';
@@ -8,11 +9,47 @@ const provider = new firebase.auth.GoogleAuthProvider();
 
 export default function Header(props) {
   const { email, setEmail } = useContext(AuthContext);
+  const router = useRouter();
 
+  //リダイレクト解決するまでそのまま
   useEffect(() => {
+
+    // const unsubscribe = auth.onAuthStateChanged(user => {
+    //   if (user && !email) {
+    //     console.log("ログイン状態を復元:", user.email);
+    //     setEmail(user.email);
+    //   }
+    // });
+    
     // 1. リダイレクト後の結果を取得
-    firebase.auth().getRedirectResult()
-      .then(result => {
+    // auth.getRedirectResult()
+    //   .then(result => {
+    //     if (result.user) {
+    //       console.log("リダイレクトログイン成功:", result.user.email);
+    //       setEmail(result.user.email);
+    //     } else {
+    //       console.log("リダイレクト後のユーザーなし");
+    //     }
+    //   })
+    //   .catch(error => {
+    //     console.error("リダイレクトログインエラー:", error);
+    //   });
+
+    // 2. ログイン状態の変更を監視
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        console.log("ログイン状態検出:", user.email);
+        setEmail(user.email);
+      }
+    });
+
+    return () => unsubscribe(); // クリーンアップ
+  }, [email, setEmail]);
+
+  // ログイン処理（リダイレクト）
+  const handleLogin = () => {
+    if (!auth.currentUser) { // すでにログインしている場合はリダイレクトしない
+      auth.signInWithPopup(provider).then(result => {
         if (result.user) {
           console.log("リダイレクトログイン成功:", result.user.email);
           setEmail(result.user.email);
@@ -23,31 +60,17 @@ export default function Header(props) {
       .catch(error => {
         console.error("リダイレクトログインエラー:", error);
       });
-
-    // 2. ログイン状態の変更を監視
-    const unsubscribe = firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        console.log("ログイン状態検出:", user.email);
-        setEmail(user.email);
-      }
-    });
-
-    return () => unsubscribe(); // クリーンアップ
-  }, []);
-
-  // ログイン処理（リダイレクト）
-  const handleLogin = () => {
-    if (!firebase.auth().currentUser) { // すでにログインしている場合はリダイレクトしない
-      firebase.auth().signInWithRedirect(provider);
     } else {
-      console.log("すでにログイン済み:", firebase.auth().currentUser.email);
+      console.log("すでにログイン済み:", auth.currentUser.email);
+      setEmail(auth.currentUser.email);
     }
   };
 
   // ログアウト処理
   const clear_email = () => {
-    firebase.auth().signOut().then(() => {
+    auth.signOut().then(() => {
       setEmail('');
+      router.replace('/');
     });
   };
 
@@ -58,9 +81,11 @@ export default function Header(props) {
       </h1>
 
       {!email ? (
-        <button className="btn btn-primary" onClick={handleLogin}>
-          Googleでログイン
-        </button>
+        <div className="text-right">
+          <button className="btn btn-primary" onClick={handleLogin}>
+            Googleでログイン
+          </button>
+        </div>
       ) : (
         <div className="text-right">
           <p>Email: {email}</p>

@@ -105,7 +105,7 @@ export default function Home() {
           {data}
         </tbody>
       </table>
-
+      {email && (
       <div className="alert alert-primary text-center">
         <div className="text-left">
           <div className="row g-3 align-items-center">
@@ -124,8 +124,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-        
+      )}
       </Layout>
     </div>
   )

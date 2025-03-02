@@ -20,7 +20,7 @@ export default function Log_in() {
     let isPopupClosed = false;
 
     fetchTelephoneData(email);
-
+    setMessage("logined by " + email);
     // auth.signInWithPopup(provider)
     //   .then(result => {
     //     if (isPopupClosed) return; // ポップアップが閉じられていたら処理しない
@@ -61,8 +61,6 @@ export default function Log_in() {
   return (
     <div>
       <Layout header="あやしい電話番号" title="マイページ">
-        <h1>{message}</h1>
-        <p>Email: {email}</p>
         <div className="text-right">
           <Link href=".">
             <button className="btn btn-primary form-text">
