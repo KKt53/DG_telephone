@@ -18,6 +18,15 @@ export default function Log_in() {
 
   useEffect(() => {
     let isPopupClosed = false;
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        console.log("ログイン状態検出:", user.email);
+        setEmail(user.email);
+      }
+      else{
+        router.replace('/');
+      }
+    });
 
     fetchTelephoneData(email);
     setMessage("logined by " + email);
@@ -39,7 +48,8 @@ export default function Log_in() {
     //       router.replace('/'); // 即リダイレクト
     //     }
     //   });
-  }, []);
+    return () => unsubscribe();
+  }, [email, setEmail]);
 
   const fetchTelephoneData = (email) => {
     if (!email) return;

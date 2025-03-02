@@ -8,6 +8,7 @@ import Link from 'next/link';
 import AuthContext from '../contexts/AuthContext';
 
 const db = firebase.firestore();
+const auth = firebase.auth();
 
 export default function Home() {
   const [data, setData] = useState([]);
@@ -25,6 +26,12 @@ export default function Home() {
 
   useEffect(() => {
 
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        console.log("ログイン状態検出:", user.email);
+        setEmail(user.email);
+      }
+    });
     if (router.query.id) {
 
         setTelephone_number(router.query.id);
@@ -44,6 +51,7 @@ export default function Home() {
     } else {
     setMessage('電話番号なし');
     }
+    return () => unsubscribe();
   }, [router.query.id]);
 
   const doAction = (()=> {
