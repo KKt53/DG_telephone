@@ -14,6 +14,8 @@ export default function Header(props) {
   //リダイレクト解決するまでそのまま
   useEffect(() => {
 
+    console.log("useEffect発火", email);
+
     // const unsubscribe = auth.onAuthStateChanged(user => {
     //   if (user && !email) {
     //     console.log("ログイン状態を復元:", user.email);
@@ -40,11 +42,16 @@ export default function Header(props) {
       if (user) {
         console.log("ログイン状態検出:", user.email);
         setEmail(user.email);
+
+      } else {
+        console.log("ログアウト状態");
+        setEmail('');
+
       }
     });
 
     return () => unsubscribe(); // クリーンアップ
-  }, [email, setEmail]);
+  }, []);
 
   // ログイン処理（リダイレクト）
   const handleLogin = () => {
