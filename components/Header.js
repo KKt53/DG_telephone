@@ -14,7 +14,7 @@ export default function Header(props) {
   //リダイレクト解決するまでそのまま
   useEffect(() => {
 
-    console.log("useEffect発火", email);
+    // console.log("useEffect発火", email);
 
     // const unsubscribe = auth.onAuthStateChanged(user => {
     //   if (user && !email) {
@@ -41,10 +41,12 @@ export default function Header(props) {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
         console.log("ログイン状態検出:", user.email);
+        alert("ログイン状態検出: " + user.email);
         setEmail(user.email);
 
       } else {
         console.log("ログアウト状態");
+        alert("ログアウト状態");
         setEmail('');
 
       }
@@ -59,6 +61,7 @@ export default function Header(props) {
       auth.signInWithPopup(provider).then(result => {
         if (result.user) {
           console.log("リダイレクトログイン成功:", result.user.email);
+          alert("ログイン");
           setEmail(result.user.email);
         } else {
           console.log("リダイレクト後のユーザーなし");
@@ -77,6 +80,7 @@ export default function Header(props) {
   const clear_email = () => {
     auth.signOut().then(() => {
       setEmail('');
+      alert("ログアウト");
       router.replace('/');
     });
   };
