@@ -40,13 +40,13 @@ export default function Header(props) {
     // 2. ログイン状態の変更を監視
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
-        console.log("ログイン状態検出:", user.email);
-        alert("ログイン状態検出: " + user.email);
+        // console.log("ログイン状態検出:", user.email);
+        // alert("ログイン状態検出: " + user.email);
         setEmail(user.email);
 
       } else {
-        console.log("ログアウト状態");
-        alert("ログアウト状態");
+        // console.log("ログアウト状態");
+        // alert("ログアウト状態");
         setEmail('');
 
       }
@@ -61,7 +61,7 @@ export default function Header(props) {
       auth.signInWithPopup(provider).then(result => {
         if (result.user) {
           console.log("リダイレクトログイン成功:", result.user.email);
-          alert("ログイン");
+          // alert("ログイン");
           setEmail(result.user.email);
         } else {
           console.log("リダイレクト後のユーザーなし");
@@ -80,7 +80,7 @@ export default function Header(props) {
   const clear_email = () => {
     auth.signOut().then(() => {
       setEmail('');
-      alert("ログアウト");
+      // alert("ログアウト");
       router.replace('/');
     });
   };
