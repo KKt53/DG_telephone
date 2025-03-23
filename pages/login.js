@@ -82,7 +82,9 @@ export default function Log_in() {
         <div className="alert alert-primary text-center">
           <div className="g-3 align-items-center">
             <div className="col-auto">
-              <h1>{message}</h1>
+              <h1 style={{ fontSize: "min(4vw, 1.5rem)" }}>
+                {message}
+              </h1>
             </div>
           </div>
         </div>
