@@ -8,6 +8,7 @@ export default function Layout(props) {
     <div>
       <Head>
         <title>{props.title}</title>
+        <meta name="google-site-verification" content="4vCiz7a82kEvLon-2AKxB1ClAAUiNJHj7EMmXtnkCps" />
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
           crossorigin="anonymous"></link>
       </Head>
