@@ -87,7 +87,7 @@ export default function Header(props) {
 
   return (
     <div>
-      <h1 className="bg-primary px-3 text-white text-right text-4xl md:text-2xl">
+      <h1 className="bg-primary px-3 text-white text-center text-4xl md:text-2xl">
         {props.header}
       </h1>
 

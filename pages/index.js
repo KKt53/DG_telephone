@@ -36,8 +36,13 @@ export default function Home() {
           </tr>
         )
       })
-      setData(mydata)
-      setMessage("検索した電話番号: " + find)
+
+      if(mydata.length === 0){
+        setMessage("安全な電話番号かもしれないけど気を付けて！　それでも怪しかったら登録を！")
+      }else{
+        setData(mydata)
+        setMessage("検索した電話番号: " + find)
+      }
     })
     .catch(error => {
       setMessage("エラーが発生しました: " + error.message);
@@ -69,7 +74,7 @@ export default function Home() {
             </div>
             <div class="col-auto">
               <button onClick={doAction} className="btn btn-primary form-text">
-                Find
+                検索
               </button>
             </div>
           </div>
@@ -86,6 +91,13 @@ export default function Home() {
             {data}
           </tbody>
         </table>
+        <div class="text-right">
+          <Link href="./how-to-add">
+            <button className="btn btn-primary form-text">
+              サイトアイコンの設置の仕方
+            </button>
+          </Link>
+        </div>
       </Layout>
     </div>
   )

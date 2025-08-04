@@ -15,7 +15,7 @@ export default function Layout(props) {
       <Header header={props.header} />
       <div className="container">
         <h3 className="my-3 text-primary text-center">
-          {props.title}</h3>
+          </h3>
           {props.children}
       </div>
       <Footer footer="created By Kota Kamon." />
