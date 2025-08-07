@@ -62,7 +62,7 @@ export default function Add() {
 
   return (
     <div>
-      <Layout header="あやしい電話番号" title="電話番号登録画面">
+      <Layout header="あやしい電話番号" title="あやしい電話番号 / 電話番号登録画面">
         <div class="text-right">
           <Link href="./login">
             <button className="btn btn-primary form-text">

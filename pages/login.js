@@ -70,7 +70,7 @@ export default function Log_in() {
 
   return (
     <div>
-      <Layout header="あやしい電話番号" title="マイページ">
+      <Layout header="あやしい電話番号" title="あやしい電話番号 / マイページ">
         <div className="text-right">
           <Link href=".">
             <button className="btn btn-primary form-text">

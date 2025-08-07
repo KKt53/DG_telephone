@@ -16,6 +16,7 @@ export default function Home() {
   const mydata = [];
   const router = useRouter();
   const [contents, setContens] = useState('');
+  const [views, setViews] = useState(null);
   const [telephone_number, setTelephone_number] = useState('');
   const { email, setEmail } = useContext(AuthContext);
   const { desc } = router.query;
@@ -32,14 +33,19 @@ export default function Home() {
         setEmail(user.email);
       }
     });
+
     if (router.query.id) {
 
         setTelephone_number(router.query.id);
         setMessage('検索した電話番号：' + router.query.id);
-        db.collection('コメント').where('電話番号', '==', router.query.id).get().then(snapshot=> {
+
+
+      db.collection('コメント')
+        .where('電話番号', '==', router.query.id)
+        .get()
+        .then(snapshot=> {
             snapshot.forEach((document)=> {
                 const doc = document.data()
-                
                 mydata.push(
                 <tr key={document.id}>
                     <td>{doc.内容}</td>
@@ -48,9 +54,29 @@ export default function Home() {
             })
             setData(mydata);
         });
+
+      db.collection('電話番号')
+        .where('登録した電話番号', '==', router.query.id)
+        .get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            const doc = snapshot.docs[0]; // 一致する最初のドキュメント
+            const docRef = doc.ref;
+            const data = doc.data();
+            const currentViews = data.閲覧回数 || 0;
+
+            setViews(currentViews + 1); // 表示用にセット
+            docRef.update({ 閲覧回数: currentViews + 1 }); // 閲覧回数 +1 に更新
+          } else {
+            // 一致するドキュメントがなかった場合の処理（必要なら）
+            setViews(1);
+          }
+        });
+
     } else {
-    setMessage('電話番号なし');
+      setMessage('電話番号なし');
     }
+
     return () => unsubscribe();
   }, [router.query.id]);
 
@@ -102,7 +128,9 @@ export default function Home() {
       <h5 className="mb-4 text-center">{message}
         <div>説明：{router.query.desc}
           </div>
-        </h5>
+        <div>閲覧回数：{views} 回
+          </div>
+      </h5>
       <table className="table bg-white text-center">
         <thead>
           <tr>

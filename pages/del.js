@@ -32,7 +32,7 @@ export default function Delete(props) {
 
   return (
     <div>
-      <Layout header="あやしい電話番号" title="削除ページ">
+      <Layout header="あやしい電話番号" title="あやしい電話番号 / 削除ページ">
         <div class="text-right">
           <Link href="./login">
             <button className="btn btn-primary form-text">

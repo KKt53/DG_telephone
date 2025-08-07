@@ -12,7 +12,7 @@ import AuthContext from '../contexts/AuthContext';
 export default function HowToAdd() {
   return (
     <div>
-      <Layout header="あやしい電話番号" title="コメント投稿ページ">
+      <Layout header="あやしい電話番号" title="あやしい電話番号 / サイトアイコンの設置の仕方">
         <div class="text-right">
           <Link href=".">
             <button className="btn btn-primary form-text">

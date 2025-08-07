@@ -11,7 +11,7 @@ const db = firebase.firestore();
 export default function Home() {
   const [data, setData] = useState([]);
   const [find, setFind] = useState('')
-  const [message, setMessage] = useState('検索バーに電話番号を入力して「Find」ボタンを押して検索してください');
+  const [message, setMessage] = useState('検索バーに電話番号を入力して「検索」ボタンを押して検索してください');
   const { email, setEmail } = useContext(AuthContext);
 
 
@@ -51,8 +51,7 @@ export default function Home() {
 
   return (
     <div>
-      
-      <Layout header="あやしい電話番号" title="トップページ">
+      <Layout header="あやしい電話番号" title="あやしい電話番号">
       {email && (
       <div class="text-right">
         <Link href="./login">

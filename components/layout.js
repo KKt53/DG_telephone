@@ -9,8 +9,8 @@ export default function Layout(props) {
       <Head>
         <title>{props.title}</title>
         <meta name="google-site-verification" content="4vCiz7a82kEvLon-2AKxB1ClAAUiNJHj7EMmXtnkCps" />
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" 
-          crossorigin="anonymous"></link>
+        <meta name="description" content="迷惑電話や詐欺の可能性がある番号を検索できます。ユーザーによる通報や口コミも確認可能です。"></meta>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossorigin="anonymous"></link>
       </Head>
       <Header header={props.header} />
       <div className="container">
