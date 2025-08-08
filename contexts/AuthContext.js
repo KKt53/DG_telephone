@@ -1,6 +1,9 @@
 import { createContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext();
+const AuthContext = createContext({
+  email: '',
+  setEmail: () => {},
+});
 
 export const AuthProvider = ({ children }) => {
   const [email, setEmail] = useState(null);
@@ -11,6 +14,15 @@ export const AuthProvider = ({ children }) => {
       setEmail(storedEmail);
     }
   }, []);
+
+  // email が変化したら localStorage に保存 or 削除
+  useEffect(() => {
+    if (email) {
+      localStorage.setItem('email', email);
+    } else {
+      localStorage.removeItem('email');
+    }
+  }, [email]);
 
   return (
     <AuthContext.Provider value={{ email, setEmail }}>

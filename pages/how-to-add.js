@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useContext } from 'react';
 import Layout from '../components/layout';
-import firebase from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import 'firebase/firestore';
 import { useRouter } from 'next/router';
 import '../components/fire';

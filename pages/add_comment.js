@@ -1,169 +1,176 @@
 import { useState, useEffect, useContext } from 'react';
 import Layout from '../components/layout';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
 import { useRouter } from 'next/router';
-import '../components/fire';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  addDoc
+} from 'firebase/firestore';
+import '../components/fire'; // ← initializeApp のみ
 import Link from 'next/link';
 import AuthContext from '../contexts/AuthContext';
 
-const db = firebase.firestore();
-const auth = firebase.auth();
+const auth = getAuth();
+const db = getFirestore();
 
 export default function Home() {
   const [data, setData] = useState([]);
   const [message, setMessage] = useState('wait...');
-  const mydata = [];
-  const router = useRouter();
-  const [contents, setContens] = useState('');
+  const [contents, setContents] = useState('');
   const [views, setViews] = useState(null);
   const [telephone_number, setTelephone_number] = useState('');
   const { email, setEmail } = useContext(AuthContext);
-  const { desc } = router.query;
+  const router = useRouter();
 
-  const onChangeFind = ((e)=> {
-    setContens(e.target.value)
-  })
+  const onChangeFind = (e) => {
+    setContents(e.target.value);
+  };
 
   useEffect(() => {
-
-    const unsubscribe = auth.onAuthStateChanged(user => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
       if (user) {
         console.log("ログイン状態検出:", user.email);
         setEmail(user.email);
       }
     });
 
-    if (router.query.id) {
+    const fetchData = async () => {
+      const id = router.query.id;
+      if (!id) {
+        setMessage('電話番号なし');
+        return;
+      }
 
-        setTelephone_number(router.query.id);
-        setMessage('検索した電話番号：' + router.query.id);
+      setTelephone_number(id);
+      setMessage('検索した電話番号：' + id);
 
+      // コメント取得
+      const commentsQuery = query(
+        collection(db, 'コメント'),
+        where('電話番号', '==', id)
+      );
+      const commentSnapshot = await getDocs(commentsQuery);
+      const commentRows = [];
+      commentSnapshot.forEach(doc => {
+        const d = doc.data();
+        commentRows.push(
+          <tr key={doc.id}>
+            <td>{d.内容}</td>
+          </tr>
+        );
+      });
+      setData(commentRows);
 
-      db.collection('コメント')
-        .where('電話番号', '==', router.query.id)
-        .get()
-        .then(snapshot=> {
-            snapshot.forEach((document)=> {
-                const doc = document.data()
-                mydata.push(
-                <tr key={document.id}>
-                    <td>{doc.内容}</td>
-                </tr>
-                )
-            })
-            setData(mydata);
-        });
+      // 閲覧回数取得 + 更新
+      const telQuery = query(
+        collection(db, '電話番号'),
+        where('登録した電話番号', '==', id)
+      );
+      const telSnapshot = await getDocs(telQuery);
+      if (!telSnapshot.empty) {
+        const telDoc = telSnapshot.docs[0];
+        const docRef = telDoc.ref;
+        const telData = telDoc.data();
+        const currentViews = telData.閲覧回数 || 0;
+        setViews(currentViews + 1);
+        await updateDoc(docRef, { 閲覧回数: currentViews + 1 });
+      } else {
+        setViews(1);
+      }
+    };
 
-      db.collection('電話番号')
-        .where('登録した電話番号', '==', router.query.id)
-        .get()
-        .then(snapshot => {
-          if (!snapshot.empty) {
-            const doc = snapshot.docs[0]; // 一致する最初のドキュメント
-            const docRef = doc.ref;
-            const data = doc.data();
-            const currentViews = data.閲覧回数 || 0;
-
-            setViews(currentViews + 1); // 表示用にセット
-            docRef.update({ 閲覧回数: currentViews + 1 }); // 閲覧回数 +1 に更新
-          } else {
-            // 一致するドキュメントがなかった場合の処理（必要なら）
-            setViews(1);
-          }
-        });
-
-    } else {
-      setMessage('電話番号なし');
-    }
+    fetchData();
 
     return () => unsubscribe();
   }, [router.query.id]);
 
-  const doAction = (()=> {
-    
-    if(!contents.trim()){
+  const doAction = async () => {
+    if (!contents.trim()) {
       setMessage("コメントを入力してください");
       return;
     }
-    else{
-      setMessage("");
-    }
 
-    if(!email.trim()){
+    if (!email.trim()) {
       setMessage("先にログインしてください");
       return;
     }
-    else{
-      setMessage("");
-    }
 
     const ob = {
-      電話番号:telephone_number,
-      内容:contents,
-      email:email
-    }
-    db.collection('コメント').add(ob).then(ref=> {
+      電話番号: telephone_number,
+      内容: contents,
+      email: email
+    };
+
+    try {
+      const docRef = await addDoc(collection(db, 'コメント'), ob);
       setData(prevData => [
         ...prevData,
-        <tr key={ref.id}>
+        <tr key={docRef.id}>
           <td>{ob.内容}</td>
         </tr>
       ]);
-    });
-  });
+      setMessage("コメントを追加しました");
+      setContents('');
+    } catch (err) {
+      setMessage("コメントの追加に失敗しました");
+      console.error(err);
+    }
+  };
 
   return (
     <div>
-      
       <Layout header="あやしい電話番号" title="コメント投稿ページ">
-      <div class="text-right">
-        <Link href=".">
-          <button className="btn btn-primary form-text">
-            トップ
-          </button>
-        </Link>
-      </div>
-      
-      <h5 className="mb-4 text-center">{message}
-        <div>説明：{router.query.desc}
-          </div>
-        <div>閲覧回数：{views} 回
-          </div>
-      </h5>
-      <table className="table bg-white text-center">
-        <thead>
-          <tr>
-              <th>コメント一覧</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data}
-        </tbody>
-      </table>
-      {email && (
-      <div className="alert alert-primary text-center">
-        <div className="text-left">
-          <div className="row g-3 align-items-center">
-            <div class="col-auto">
-              <label >追加するコメント:</label>
-            </div>
-            <div class="col">
-              <input type="text" onChange={onChangeFind}
-                className="form-control" />
-            </div>
-            <div class="col-auto">
-            <button onClick={doAction} className="btn btn-primary">
-              Add
-            </button>
-            </div>
-          </div>
+        <div className="text-right">
+          <Link href=".">
+            <button className="btn btn-primary form-text">トップ</button>
+          </Link>
         </div>
-      </div>
-      )}
+
+        <h5 className="mb-4 text-center">
+          {message}
+          <div>説明：{router.query.desc}</div>
+          <div>閲覧回数：{views} 回</div>
+        </h5>
+
+        <table className="table bg-white text-center">
+          <thead>
+            <tr>
+              <th>コメント一覧</th>
+            </tr>
+          </thead>
+          <tbody>{data}</tbody>
+        </table>
+
+        {email && (
+          <div className="alert alert-primary text-center">
+            <div className="text-left">
+              <div className="row g-3 align-items-center">
+                <div className="col-auto">
+                  <label>追加するコメント:</label>
+                </div>
+                <div className="col">
+                  <input
+                    type="text"
+                    onChange={onChangeFind}
+                    value={contents}
+                    className="form-control"
+                  />
+                </div>
+                <div className="col-auto">
+                  <button onClick={doAction} className="btn btn-primary">
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </Layout>
     </div>
-  )
-
+  );
 }
-
