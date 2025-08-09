@@ -4,7 +4,8 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import AuthContext from '../contexts/AuthContext';
 
-import { db } from '../components/fire'; // ← Firestore をインポート
+import { db } from '../components/fire';
+import { collection, addDoc } from 'firebase/firestore'; // ← 必要なモジュールを追加
 
 export default function Add() {
   const [message_number, setMessage_number] = useState('');
@@ -22,7 +23,7 @@ export default function Add() {
     setExplanation(e.target.value);
   };
 
-  const doAction = () => {
+  const doAction = async () => {
     if (!telephone_number.trim()) {
       setMessage_number('電話番号を入力してください');
       return;
@@ -43,9 +44,13 @@ export default function Add() {
       email: email,
     };
 
-    db.collection('電話番号').add(ob).then(() => {
-      router.push('login');
-    });
+    try {
+      const colRef = collection(db, '電話番号');
+      await addDoc(colRef, ob);
+      router.push('mypage');
+    } catch (error) {
+      console.error("追加エラー:", error);
+    }
   };
 
   useEffect(() => {

@@ -1,11 +1,11 @@
 import {useState, useEffect} from 'react'
 import Layout from '../components/layout'
-import firebase from 'firebase'
+import { getFirestore, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router'
 import '../components/fire'
 import Link from 'next/link';
 
-const db = firebase.firestore()
+const db = getFirestore();
 
 export default function Delete(props) {
   const [message, setMessage] = useState('wait.')
@@ -13,21 +13,29 @@ export default function Delete(props) {
   const router = useRouter()
     
   useEffect(() => {
-    if (router.query.id) {
-      setMessage('Delete id = ' + router.query.id);
-      db.collection('電話番号').doc(router.query.id).get().then((ob) => {
-        setData(ob.data());
-      });
-    } else {
-      setMessage((prevMessage) => prevMessage + '.');
-    }
+    const fetchData = async () => {
+      if (router.query.id) {
+        setMessage('Delete id = ' + router.query.id);
+        const docRef = doc(db, '電話番号', router.query.id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setData(docSnap.data());
+        } else {
+          setMessage('データが存在しません。');
+        }
+      } else {
+        setMessage((prevMessage) => prevMessage + '.');
+      }
+    };
+
+    fetchData();
   }, [router.query.id]);
 
- const doAction = (e)=> {
-    db.collection('電話番号').doc(router.query.id)
-        .delete().then(ref=> {
-      router.push('login')
-    })
+ const doAction = async (e) => {
+    if (!router.query.id) return;
+    const docRef = doc(db, '電話番号', router.query.id);
+    await deleteDoc(docRef);
+    router.push('mypage');
   }
 
   return (

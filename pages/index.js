@@ -106,6 +106,11 @@ export default function Home() {
             <button className="btn btn-primary form-text">サイトアイコンの設置の仕方</button>
           </Link>
         </div>
+        <div className="text-right">
+          <Link href="./how-to-use">
+            <button className="btn btn-primary form-text">このWEBアプリの使い方</button>
+          </Link>
+        </div>
       </Layout>
     </div>
   );
